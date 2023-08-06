@@ -12,7 +12,7 @@ export class BrowserController {
       const data = await this.service.login(body);
       return res.send({ data });
     } catch (error) {
-      return res.send({});
+      return res.send({ errorMsg: error?.toString() });
     }
   }
 }
