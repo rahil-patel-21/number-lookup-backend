@@ -1,8 +1,8 @@
 // Imports
 import { Injectable } from '@nestjs/common';
 import * as puppeteer from 'puppeteer';
-import { EnvConfig } from 'src/constants/env.config';
-import { nNumLookupLogIn } from 'src/constants/network';
+import { EnvConfig } from './../constants/env.config';
+import { nNumLookupLogIn } from './../constants/network';
 
 @Injectable()
 export class BrowserService {
