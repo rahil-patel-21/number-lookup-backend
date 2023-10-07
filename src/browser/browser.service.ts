@@ -98,6 +98,13 @@ export class BrowserService {
     return { html };
   }
 
+  async evaluateJs(reqData) {
+    const code = reqData.code;
+    const currentPage = (await browserData.numLookUpInstance.pages())[1];
+    const response = await currentPage.evaluate(code);
+    return response;
+  }
+
   delay(time) {
     return new Promise(function (resolve) {
       setTimeout(resolve, time);

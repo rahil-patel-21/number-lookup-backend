@@ -25,4 +25,14 @@ export class BrowserController {
       return res.send({ errorMsg: error?.toString() });
     }
   }
+
+  @Post('evaluateJs')
+  async funEvaluateJs(@Body() body, @Res() res) {
+    try {
+      const data = await this.service.login(body);
+      return res.send({ data });
+    } catch (error) {
+      return res.send({ errorMsg: error?.toString() });
+    }
+  }
 }
