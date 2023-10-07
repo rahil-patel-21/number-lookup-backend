@@ -88,6 +88,16 @@ export class BrowserService {
     currentPage.on('request', onReqListener);
   }
 
+  async snapshot() {
+    const currentPage = (await browserData.numLookUpInstance.pages())[1];
+
+    const html = await currentPage.evaluate(
+      () => document.documentElement.innerHTML,
+    );
+
+    return { html };
+  }
+
   delay(time) {
     return new Promise(function (resolve) {
       setTimeout(resolve, time);
