@@ -57,6 +57,16 @@ export class BrowserService {
     await currentPage.click('input[type="submit"]');
     await this.delay(1985);
 
+    try {
+      await this.delay(2197);
+      await currentPage.type('input[name="iProofPhone"]', '0021');
+      await this.delay(1869);
+      await currentPage.click('input[type="submit"]');
+      await this.delay(1985);
+    } catch (error) {
+      console.log(error);
+    }
+
     // Save login info
     await currentPage.type('input[name="DontShowAgain"]', 'true');
     await this.delay(1297);
