@@ -9,5 +9,10 @@ export const EnvConfig = {
   },
   network: {
     numLookupLogIn: process.env.NUM_LOOKUP_LOGIN ?? '',
+    numLookUp: {
+      defaultSearch: process.env.NUM_LOOKUP_DEFAULT_SEARCH ?? '',
+      homePage: process.env.NUM_LOOKUP_HOME_PAGE ?? '',
+      search: process.env.NUM_LOOKUP_SEARCH ?? '',
+    },
   },
 };

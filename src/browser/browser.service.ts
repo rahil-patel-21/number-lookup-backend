@@ -1,8 +1,20 @@
 // Imports
+const os = require('os');
 import { Injectable } from '@nestjs/common';
 import * as puppeteer from 'puppeteer';
 import { EnvConfig } from './../constants/env.config';
-import { nNumLookupLogIn } from './../constants/network';
+import {
+  nNumLookupDefaultSearch,
+  nNumLookupHomePage,
+  nNumLookupLogIn,
+  nNumLookupSearch,
+} from './../constants/network';
+
+const browserData = {
+  numLookUpInstance: null,
+  isNumLookUpLoggedIn: false,
+  numLookUpAuthToken: '',
+};
 
 @Injectable()
 export class BrowserService {
@@ -11,11 +23,19 @@ export class BrowserService {
   }
 
   async logInToNumberLookup() {
-    const browser = await puppeteer.launch({
-      defaultViewport: null,
-      headless: false,
-    });
-    const currentPage = await browser.newPage();
+    if (browserData.isNumLookUpLoggedIn == true)
+      return {
+        msg: 'Already logged in !',
+        numLookUpAuthToken: browserData.numLookUpAuthToken,
+      };
+
+    if (!browserData.numLookUpInstance) {
+      browserData.numLookUpInstance = await puppeteer.launch({
+        defaultViewport: null,
+        headless: os.type() == 'Darwin' ? false : true,
+      });
+    }
+    const currentPage = await browserData.numLookUpInstance.newPage();
     await currentPage.goto(nNumLookupLogIn, { waitUntil: 'networkidle2' });
 
     // Enter email automatically
@@ -28,7 +48,7 @@ export class BrowserService {
     await currentPage.click('input[type="submit"]');
 
     // Enter password automatically
-    await this.delay(2137);
+    await this.delay(3137);
     await currentPage.type(
       'input[name="passwd"]',
       EnvConfig.personalSecrets.email01Pass,
@@ -42,6 +62,30 @@ export class BrowserService {
     await this.delay(1297);
     await currentPage.click('input[type="submit"]');
     await this.delay(1681);
+
+    const onFrameNavigationListener = async (req) => {
+      if (req.url() == nNumLookupHomePage) {
+        await this.delay(6788);
+        await currentPage.goto(nNumLookupDefaultSearch);
+        currentPage.removeListener('framenavigated', onFrameNavigationListener);
+      }
+    };
+    currentPage.on('framenavigated', onFrameNavigationListener);
+
+    const onReqListener = (req) => {
+      if (req.url().includes(nNumLookupSearch)) {
+        const authToken = req
+          .headers()
+          .authorization?.replace('Bearer ', '')
+          ?.trim();
+        if (authToken) {
+          browserData.numLookUpAuthToken = authToken;
+          browserData.isNumLookUpLoggedIn = true;
+          currentPage.removeListener('request', onReqListener);
+        }
+      }
+    };
+    currentPage.on('request', onReqListener);
   }
 
   delay(time) {
